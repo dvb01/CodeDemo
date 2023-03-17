@@ -56,7 +56,8 @@ begin
    end;
 
 
-end;```     
+end;
+```     
 
 4. в листе не может быть дубликатов
 5. лист напрямую не удаляет свои элементы, а вызывает `IAmItem.ListRelease`,  а там уже выполняется действие, например, `TObject.Free` или `TMyObject_IAmItem.List :=nil;`
@@ -71,7 +72,7 @@ end;```
 Модуль помощи определения текущего масштаба приложения.
 Поможет рассчитать высоты размеры шрифтов и т.д.
 Требует внешнего вызова при OnMainFormCreate и при  OnMainFormShow.
-```pascal
+``` pascal
 procedure TForm3.FormAfterMonitorDpiChanged(Sender: TObject; OldDPI,
   NewDPI: Integer);
 begin
