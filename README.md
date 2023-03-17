@@ -26,12 +26,18 @@
 
 -`TAmListItemInf` удаляется  когда счетчик ссылок  равен 0
 ```pascal
+procedure TForm3.FormCreate(Sender: TObject);
 var ListI:IAmListItem;
     ListO:TAmListItemObj;
+    ListPers:TAmListItemColection;
 begin
    ListI:= TAmListItemInf.Create;
-    // список интерфейс
-    ListI.Add(TAmItemObject.Create(nil));
+   try
+      // список интерфейс
+      ListI.Add(TAmItemObject.Create(nil));
+   finally
+     ListI:=nil;
+   end;
 
    ListO:= TAmListItemObj.Create;
    try
@@ -41,8 +47,16 @@ begin
      FreeAndNil(ListO);
    end;
 
-end;
-```     
+   ListPers:=TAmListItemColection.Create;
+   try
+        // список объект, который поддерживается в design-time
+        ListPers.Add(TAmItemPersInf.Create(nil));
+   finally
+     ListPers.Free;
+   end;
+
+
+end;```     
 
 4. в листе не может быть дубликатов
 5. лист напрямую не удаляет свои элементы, а вызывает `IAmItem.ListRelease`,  а там уже выполняется действие, например, `TObject.Free` или `TMyObject_IAmItem.List :=nil;`
@@ -57,6 +71,29 @@ end;
 Модуль помощи определения текущего масштаба приложения.
 Поможет рассчитать высоты размеры шрифтов и т.д.
 Требует внешнего вызова при OnMainFormCreate и при  OnMainFormShow.
+```pascal
+procedure TForm3.FormAfterMonitorDpiChanged(Sender: TObject; OldDPI,
+  NewDPI: Integer);
+begin
+  AmUserScale.AmScale.AfterMonitorDpiChanged(NewDPI,OldDPI);
+end;
+
+procedure TForm3.FormBeforeMonitorDpiChanged(Sender: TObject; OldDPI,
+  NewDPI: Integer);
+begin
+   AmUserScale.AmScale.BeforeMonitorDpiChanged(NewDPI,OldDPI);
+end;
+
+procedure TForm3.FormCreate(Sender: TObject);
+begin
+  AmUserScale.AmScale.Init;
+end;
+
+procedure TForm3.FormShow(Sender: TObject);
+begin
+   AmUserScale.AmScale.Show;
+end;
+```
  
 ##  AmHookWin.pas
 Хук перехвата winapi сообщений для текущего приложения.
