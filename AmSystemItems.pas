@@ -345,16 +345,17 @@ type
 
 
 
- // универсальный лист для разных пронумарованных объектов
- // 1. имеет события на каждое действие
- // 2. может хранит все что угодно унаследованное от  IAmItem
- // IAmItem оч просто создается в любом вашем классе можно посмотеть пример TAmItemPersInf
- // 3. выше есть часто используемые классы которые можно ложить в  TAmListItem
- // 4. Если вы не пользуетесь интерфесом листа IAmListItem то используйте  TAmListItemObj иначе  TAmListItemInf
- // TAmListItemObj удаляется только через TObject.Free;
- // TAmListItemInf через кол-во ссылок interface(TAmListItemInf) =nil
- // 5. в листе не может быть дубликатов
- // 6. лист напрямую не удаляет свои итемы а вызывает IAmItem.ListRelease  а там уже сами делаете нужно действие free например или List :=nil
+  // Универсальный лист для разных пронумерованных объектов
+  // 1. имеет события на каждое действие
+  // 2. может хранит все что угодно унаследованное от  IAmItem
+  // IAmItem просто создается в любом классе можно посмотреть пример TAmItemPersInf
+  //выше есть часто используемые классы которые можно ложить в  TAmListItem
+  // 4. Если не пользуетесь интерфейсом листа IAmListItem то используйте  TAmListItemObj, иначе  TAmListItemInf
+  // 5. TAmListItemObj удаляется только через TObject.Free;
+  // 6. TAmListItemInf через кол-во ссылок interface(TAmListItemInf) =nil
+  //7. в листе не может быть дубликатов
+  //8. лист напрямую не удаляет свои итемы а вызывает IAmItem.ListRelease,  а там уже выполняется действие free например или List :=nil
+
   TAmListItemCustom = class abstract (TAmListBaseInterfaced<IAmItem>,IAmListItem,IAmListItemOwner)
     type
      TEventCreate = procedure (var NewItem:IAmItem)of object;
@@ -480,7 +481,7 @@ type
 
     public
       procedure Loaded;virtual; //запустить в root при  TComponent.Loaded
-      procedure DefineProperties(СonsequenceNameProperty:string;Filer: TFiler); virtual;
+      procedure DefineProperties(СonsequenceNameProperty:string;Filer: TFiler); virtual;  //запустить в root при  TComponent.DefineProperties
       function WriteSignatureOneItem(Item:IAmItem):string;virtual;
       function ReadSignatureOneItem(Input:string):IAmItem;virtual;
   end;
@@ -531,7 +532,7 @@ type
 
      //////////////////////////////////////
 
-     
+
    public
       constructor Create;
       Destructor Destroy;override;
@@ -1670,7 +1671,7 @@ procedure TAmListItemCustom.Move(CurIndex, NewIndex: Integer);
 var Prm:TAmItemsPrm;
 begin
   if CurIndex = NewIndex then  exit;
-  
+
   ChangeLock;
   try
       if FIsNeedEvent then
@@ -2132,7 +2133,7 @@ begin
    Result:=false;
    if Item<>nil then C:=TObject(Item).ClassName
    else              C:='nil';
-   if C<>'' then   
+   if C<>'' then
    raise Exception.Create('Error TAmListItemColection.ReadInvalidClass [Index:'+Index.ToString+' Class:'+C+']');
 end;
 
@@ -2161,8 +2162,8 @@ end;
 function TAmListItemColection.IsMyChildObject(ACheckObject: TObject): boolean;
 begin
   Result:=false;
-  if ACheckObject = nil then exit;  
-  Result:=  FPersDesingNotify = ACheckObject;  
+  if ACheckObject = nil then exit;
+  Result:=  FPersDesingNotify = ACheckObject;
   if not Result then
        Result:= inherited IsMyChildObject(ACheckObject);
 end;
