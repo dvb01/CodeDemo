@@ -234,5 +234,6 @@ TAmComboBox внутри себя содержит несколько компо
 `TAmLayOut, TAmPopupMenu, TAmPopupForm, TAmListBox`
 Используя класс `TAmComboAbstract` можно создать любой вид выпадающего списка
 Используя класс `TAmComboListBox` можно изменить ссылку на `ListBox`, что бы в разных состояниях отображать разные списки или таблицы. 
+![Фото](/READMEFILES/1.jpg "Фото Программы")
 
 
