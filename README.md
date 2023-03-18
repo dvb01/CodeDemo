@@ -96,12 +96,116 @@ begin
 end;
 ```
  
-##  AmHookWin.pas
+##  AmHookWinMsg.pas
 Хук перехвата winapi сообщений для текущего приложения.
-1. Создать  `TAmWinHookElem`
+1. Создать  `TAmWinHookElement`
 2. Настроить что именно отслеживать и куда пересылать (postmessage sendmessage или вызвать procedure)
-3. Запустить	`TAmWinHookElem.Start`
-4. При удалении объекта кто создавал,  удалить `TAmWinHookElem` 
+3. Запустить	` TAmWinHookElement.Start`
+4. При удалении объекта кто создавал,  удалить ` TAmWinHookElement ` 
+```pascal
+const
+  Test_Message_Post = WM_USER+1;
+  Test_Message_Send = WM_USER+2;
+  Test_Message_SendErrorCreate = WM_USER+3;
+  Test_Message_SendErrorCreate2 = WM_USER+4;
+procedure TForm25.FormCreate(Sender: TObject);
+begin
+
+  AmUserType.AmSystemInfo.ReportMemory(true);
+  El:= AmHookWinMsg.TAmWinHook.NewElement();
+  El.ListenWindowHandle:=self.Handle;
+  El.ListenMsgAdd([WM_ACTIVATE,
+                   WM_PAINT,
+                   Test_Message_Post,
+                   Test_Message_Send,
+                   Test_Message_SendErrorCreate,
+                   Test_Message_SendErrorCreate2]);
+  El.FromEnum:=  amwinhookFromProc;
+  El.FromMsgProc:= ElEvent;
+  El.Start;
+end;
+
+procedure TForm25.ElEvent(Prm:PAmWinHookMessage);
+var FormError:TForm;
+begin
+  //raise Exception.Create('Error Message');
+  // если произойдет ощибка то приложение может  завершится ничего не сообщив
+  // лист хуков во время события нельзя изменять создавать или удалять хуки Prm.Element.Free  AmHookWinMsg.TAmWinHook.NewElement();
+  // удалять или добавлять новые сообщения можно  Prm.Element.ListenMsgAdd([MY]);
+
+ try
+    Memo1.Lines.Add('====');
+    case Prm.Message of
+         WM_ACTIVATE:begin
+             Memo1.Lines.Add(' WM_ACTIVATE '+Prm.WPrm.ToString);
+         end;
+         WM_PAINT:begin
+          Memo1.Lines.Add(' WM_PAINT ');
+         end;
+         Test_Message_Post :begin
+
+             Memo1.Lines.Add(' Перехвачено PostMessage Test_Message_Post '+
+             ' WPrm:'+ Prm.WPrm.ToString +
+             ' LPrm:'+Prm.LPrm.ToString );
+
+         end;
+         Test_Message_Send:begin
+
+            Memo1.Lines.Add(' Перехвачено SendMessage Test_Message_Send  '+
+            ' WPrm:'+Prm.WPrm.ToString +
+            ' LPrm:'+Prm.LPrm.ToString );
+
+         end;
+         Test_Message_SendErrorCreate:begin
+
+            // ощибка + утечка памяти
+            AmHookWinMsg.TAmWinHook.NewElement();
+
+         end;
+         Test_Message_SendErrorCreate2:begin
+
+             raise Exception.Create('Error Message');
+
+         end;
+
+    end;
+    Memo1.Lines.Add('====');
+ except
+  on e:exception do
+  begin
+     // если не обрабатывать исключения то прога вылетит без показа сообщения
+     case 1 of
+          0:begin
+            Memo1.Lines.Add('ErrorCode.TForm25.ElEvent '+e.Message);
+          end;
+          1:begin
+             // показ модальной формы во время выполнения события
+              FormError:=TForm.Create(self);
+              FormError.Caption:= e.Message;
+              FormError.Position:=TPosition.poDesktopCenter;
+              FormError.Width:=700;
+              FormError.Height:=50;
+              FormError.Color:=clred;
+              FormError.ShowModal;
+          end;
+          2:begin
+             // показ модальной формы во время выполнения события
+             AmLogTo.DefaultFormException.Show(e.Message,e.StackTrace);
+          end;
+          3:begin
+             // показ формы после выполнения события
+             AmLogTo.DefaultFormException.ShowPost(e.Message,e.StackTrace);
+          end;
+
+     end;
+
+  end;
+ end;
+
+
+
+end;
+```
 	 
 
 ##  AmComboBox.pas 
