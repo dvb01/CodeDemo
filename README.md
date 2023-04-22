@@ -3,9 +3,10 @@
 
 
 
-## AmGridEditorToolForm.pas
-Редактор  design-time списка, который находится в `AmSystemItems.pas`
-![Фото](/READMEFILES/2.jpg "Фото Программы")
+## Редактор  design-time PtControl
+
+![Фото](/READMEFILES/3.gif "Фото Программы")
+![Фото](/READMEFILES/4.gif "Фото Программы")
 
 ##  AmSystemItems.pas
  Список с разными событиями.
